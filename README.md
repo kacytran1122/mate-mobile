@@ -225,4 +225,4 @@ flowchart TD
     class LOCAL store;
 ```
 
-The flow reads top to bottom. A user acts on a screen, the screen sends an event to a BLoC, the BLoC calls a repository, and the repository maps the response into models and talks to the external services. The BLoC then emits a new state that rebuilds the screen. Local session data is read from and written to shared_preferences.
+
