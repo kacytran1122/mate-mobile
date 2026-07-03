@@ -169,48 +169,60 @@ The diagram below shows how a request flows from a user through the app layers t
 
 ```mermaid
 flowchart TD
-    subgraph Users
+    subgraph L1["1. Users"]
+        direction LR
         C[Customer]
         S[Staff]
         A[Administrator]
     end
 
-    subgraph App["Mate app (Flutter)"]
-        UI["UI screens<br/>lib/screens and lib/widgets"]
-        BLOC["BLoCs, events, states<br/>lib/blocs, lib/events, lib/states"]
+    subgraph L2["2. Presentation layer"]
+        UI["Screens and widgets<br/>lib/screens, lib/widgets"]
+    end
+
+    subgraph L3["3. State management layer"]
+        BLOC["BLoCs with events and states<br/>lib/blocs, lib/events, lib/states"]
+    end
+
+    subgraph L4["4. Data layer"]
+        direction LR
         REPO["Repositories<br/>lib/repositories"]
         MODEL["Models<br/>lib/models"]
-        LOCAL["Local session<br/>shared_preferences"]
     end
 
-    subgraph External["External services"]
-        API["REST backend API<br/>Config.apiRoot"]
-        FB["Firebase<br/>Realtime Database and Storage"]
-        PAY["PayPal<br/>payment checkout"]
-        GAI["Google Generative AI<br/>Gemini assistant"]
+    subgraph L5["5. External services"]
+        direction LR
+        API["REST backend API"]
+        FB["Firebase<br/>Realtime DB and Storage"]
         GSI["Google Sign In"]
+        PAY["PayPal"]
+        GAI["Gemini AI"]
     end
 
-    C --> UI
-    S --> UI
-    A --> UI
+    LOCAL[("Local session<br/>shared_preferences")]
 
-    UI -- dispatch event --> BLOC
-    BLOC -- emit state --> UI
-    BLOC -- call --> REPO
-    REPO -- parse with --> MODEL
-    MODEL -- typed state data --> BLOC
+    L1 ==> UI
+    UI == events ==> BLOC
+    BLOC == states ==> UI
+    BLOC ==> REPO
+    REPO --- MODEL
+    REPO ==> L5
+    UI == checkout and advice ==> L5
+    BLOC <-. session .-> LOCAL
 
-    REPO -- HTTP requests --> API
-    REPO -- realtime chat and media --> FB
-    REPO -- authentication --> GSI
-    UI -- checkout flow --> PAY
-    UI -- generate advice --> GAI
+    classDef users fill:#E3F2FD,stroke:#1565C0,color:#0D47A1;
+    classDef ui fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20;
+    classDef state fill:#FFF3E0,stroke:#EF6C00,color:#E65100;
+    classDef data fill:#F3E5F5,stroke:#6A1B9A,color:#4A148C;
+    classDef ext fill:#FCE4EC,stroke:#AD1457,color:#880E4F;
+    classDef store fill:#ECEFF1,stroke:#455A64,color:#263238;
 
-    BLOC -- read and write session --> LOCAL
-
-    API -- JSON responses --> REPO
-    FB -- streams and files --> REPO
-    PAY -- payment result --> UI
-    GAI -- generated text --> UI
+    class C,S,A users;
+    class UI ui;
+    class BLOC state;
+    class REPO,MODEL data;
+    class API,FB,GSI,PAY,GAI ext;
+    class LOCAL store;
 ```
+
+The flow reads top to bottom. A user acts on a screen, the screen sends an event to a BLoC, the BLoC calls a repository, and the repository maps the response into models and talks to the external services. The BLoC then emits a new state that rebuilds the screen. Local session data is read from and written to shared_preferences.
