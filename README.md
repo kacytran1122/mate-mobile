@@ -15,7 +15,7 @@
 ![CMake](https://img.shields.io/badge/CMake-064F8C?logo=cmake&logoColor=white)
 ![YAML](https://img.shields.io/badge/YAML-CB171E?logo=yaml&logoColor=white)
 
-Created by Kacy Tran, Anh Minh, and Bao Long.
+Built with love by Kacy Tran, Anh Minh, and Bao Long.
 
 Mate is a cross platform mobile application built with Flutter for managing a care and companionship service. It connects three groups of people around subscription based rooms: customers who buy a care package, staff members who look after those customers and record daily attendance, and administrators who oversee the whole operation. The app supports English and Vietnamese, real time chat, an AI powered assistant, and online payments.
 
