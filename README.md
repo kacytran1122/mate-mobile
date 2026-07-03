@@ -1,4 +1,4 @@
-# Mate
+# Mate Care Service App
 
 
 ![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white)
