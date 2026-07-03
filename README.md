@@ -162,3 +162,55 @@ flutter pub run intl_utils:generate
 ## Status and license
 
 This project is provided as open source for educational and reference use. It reflects the state of the product at the time the original service was retired, so some backend endpoints and third party credentials are no longer active. You are welcome to fork it, study it, and adapt it for your own learning and projects.
+
+## End to end architecture
+
+The diagram below shows how a request flows from a user through the app layers to the external services and back. The user interacts with a role based screen, the screen dispatches an event to a BLoC, the BLoC calls a repository, and the repository talks to the backend or a Firebase or third party service. Data then flows back up as a new state that rebuilds the screen.
+
+```mermaid
+flowchart TD
+    subgraph Users
+        C[Customer]
+        S[Staff]
+        A[Administrator]
+    end
+
+    subgraph App["Mate app (Flutter)"]
+        UI["UI screens<br/>lib/screens and lib/widgets"]
+        BLOC["BLoCs, events, states<br/>lib/blocs, lib/events, lib/states"]
+        REPO["Repositories<br/>lib/repositories"]
+        MODEL["Models<br/>lib/models"]
+        LOCAL["Local session<br/>shared_preferences"]
+    end
+
+    subgraph External["External services"]
+        API["REST backend API<br/>Config.apiRoot"]
+        FB["Firebase<br/>Realtime Database and Storage"]
+        PAY["PayPal<br/>payment checkout"]
+        GAI["Google Generative AI<br/>Gemini assistant"]
+        GSI["Google Sign In"]
+    end
+
+    C --> UI
+    S --> UI
+    A --> UI
+
+    UI -- dispatch event --> BLOC
+    BLOC -- emit state --> UI
+    BLOC -- call --> REPO
+    REPO -- parse with --> MODEL
+    MODEL -- typed state data --> BLOC
+
+    REPO -- HTTP requests --> API
+    REPO -- realtime chat and media --> FB
+    REPO -- authentication --> GSI
+    UI -- checkout flow --> PAY
+    UI -- generate advice --> GAI
+
+    BLOC -- read and write session --> LOCAL
+
+    API -- JSON responses --> REPO
+    FB -- streams and files --> REPO
+    PAY -- payment result --> UI
+    GAI -- generated text --> UI
+```
